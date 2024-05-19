@@ -72,7 +72,13 @@ public class PlayerData {
 	public void setWrongAnswers(String wrongAnswers) {
 		this.wrongAnswers = wrongAnswers;
 	}
-	
-	
+
+	public Long getId() {
+		return id;
+	}
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
 	
 }
