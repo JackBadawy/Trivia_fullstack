@@ -5,6 +5,7 @@ type Answer = {
 type Question = {
   question: string;
   potentialAnswers: {
+    [x: string]: any;
     [key: number]: Answer;
   };
 };

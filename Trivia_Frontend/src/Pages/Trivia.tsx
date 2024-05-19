@@ -5,7 +5,6 @@ const Trivia = () => {
   return (
     <div>
       <Question />
-      <Answers />
     </div>
   );
 };
