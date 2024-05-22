@@ -4,12 +4,28 @@ import { triviaQuestions } from "../LookUpTables/TriviaQuestionLUT";
 const Question = () => {
   const [i, iterate] = useState(1);
 
-  const iterateQuestion = () => {
+  const [playerStats, setPlayerStats] = useState({
+    playerName: "",
+    timePerQuestion: "",
+    totalTime: "",
+    wrongAnswers: 0,
+  });
+
+  const iterateQuestion = (isCorrect: boolean) => {
+    setPlayerStats((prevStats) => ({
+      ...prevStats,
+      wrongAnswers: isCorrect
+        ? prevStats.wrongAnswers
+        : prevStats.wrongAnswers + 1,
+    }));
     if (i < 10) {
-      // Ensuring the question index does not exceed the number of questions
       iterate(i + 1);
     }
   };
+
+  useEffect(() => {
+    console.log("Player Stats updated:", playerStats);
+  }, [playerStats]);
 
   return (
     <div className="question__container">
@@ -17,10 +33,14 @@ const Question = () => {
       <p>{triviaQuestions[i].question}</p>
       {Object.values(triviaQuestions[i].potentialAnswers).map(
         (answer, index) => (
-          <p key={index}>{answer.text}</p>
+          <button key={index} onClick={() => iterateQuestion(answer.correct)}>
+            {answer.text}
+          </button>
         )
       )}
-      <button onClick={iterateQuestion}>Next Question</button>
+      <div>
+        <p>Wrong Answers: {playerStats.wrongAnswers}</p>
+      </div>
     </div>
   );
 };

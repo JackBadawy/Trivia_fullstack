@@ -1,4 +1,3 @@
-import Answers from "../Components/Answers";
 import Question from "../Components/Question";
 
 const Trivia = () => {
