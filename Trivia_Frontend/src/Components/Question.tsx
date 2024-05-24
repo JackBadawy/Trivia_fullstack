@@ -1,15 +1,10 @@
 import { useEffect, useState } from "react";
 import { triviaQuestions } from "../LookUpTables/TriviaQuestionLUT";
+import { usePlayerStats } from "../Context/usePlayerStats";
 
 const Question = () => {
   const [i, iterate] = useState(1);
-
-  const [playerStats, setPlayerStats] = useState({
-    playerName: "",
-    timePerQuestion: "",
-    totalTime: "",
-    wrongAnswers: 0,
-  });
+  const { playerStats, setPlayerStats } = usePlayerStats();
 
   const iterateQuestion = (isCorrect: boolean) => {
     setPlayerStats((prevStats) => ({
