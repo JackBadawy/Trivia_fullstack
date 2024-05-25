@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import { triviaQuestions } from "../LookUpTables/TriviaQuestionLUT";
 import { usePlayerStats } from "../Context/usePlayerStats";
+import { useNavigate } from "react-router-dom";
 
 const Question = () => {
   const [i, iterate] = useState(1);
   const { playerStats, setPlayerStats } = usePlayerStats();
   const [countdown, setCountdown] = useState(10);
+  const [totalTime, setTotalTime] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCountdown((prevCountdown) => prevCountdown - 1);
+      setTotalTime((prevTotalTime) => prevTotalTime + 1);
     }, 1000);
 
     if (countdown === 0) {
@@ -22,6 +26,7 @@ const Question = () => {
         setCountdown(10);
       } else {
         clearInterval(timer);
+        calculateFinalStats();
       }
     }
 
@@ -41,8 +46,20 @@ const Question = () => {
     }));
     if (i < 10) {
       iterate(i + 1);
-      setCountdown(10);
+      setCountdown(10); // Reset the countdown for the next question
+    } else {
+      calculateFinalStats();
     }
+  };
+
+  const calculateFinalStats = () => {
+    const averageTime = totalTime / 10;
+    setPlayerStats((prevStats) => ({
+      ...prevStats,
+      totalTime: `${totalTime} seconds`,
+      timePerQuestion: `${averageTime.toFixed(2)} seconds`,
+    }));
+    navigate("/score");
   };
 
   return (
