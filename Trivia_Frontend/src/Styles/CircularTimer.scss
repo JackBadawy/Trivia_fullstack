@@ -1,0 +1,29 @@
+.circular-timer {
+  position: relative;
+  width: 120px;
+  height: 120px;
+
+  &__background {
+    fill: none;
+    stroke: #e6e6e6;
+    stroke-width: 10;
+  }
+
+  &__progress {
+    fill: none;
+    stroke: #00bcd4;
+    stroke-width: 10;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 1s linear;
+  }
+
+  &__text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    color: #b12828;
+  }
+}

@@ -1,92 +1,78 @@
-import { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { triviaQuestions } from "../LookUpTables/TriviaQuestionLUT";
 import { usePlayerStats } from "../Context/usePlayerStats";
-import { useNavigate } from "react-router-dom";
-import { postPlayerStats } from "../Services/Stats_Service";
+import CircularTimer from "./CircularTimer";
 
-const Question = () => {
-  const [i, iterate] = useState(1);
+const Question: React.FC = () => {
+  const [i, iterate] = useState(1); // Adjusted to start from 1 index
   const { playerStats, setPlayerStats } = usePlayerStats();
   const [countdown, setCountdown] = useState(10);
   const [totalTime, setTotalTime] = useState(0);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prevCountdown) => prevCountdown - 1);
-      setTotalTime((prevTotalTime) => prevTotalTime + 1);
-    }, 1000);
+  const calculateFinalStats = useCallback(() => {
+    const averageTime = totalTime / 10;
+    setPlayerStats((prevStats) => ({
+      ...prevStats,
+      totalTime: `${totalTime} seconds`,
+      timePerQuestion: `${averageTime.toFixed(2)} seconds`,
+    }));
+    navigate("/score");
+  }, [totalTime, setPlayerStats, navigate]);
 
-    if (countdown === 0) {
+  const handleNextQuestion = useCallback(
+    (isCorrect: boolean) => {
       setPlayerStats((prevStats) => ({
         ...prevStats,
-        wrongAnswers: prevStats.wrongAnswers + 1,
+        wrongAnswers: isCorrect
+          ? prevStats.wrongAnswers
+          : prevStats.wrongAnswers + 1,
       }));
+
+      setTotalTime((prevTotalTime) => prevTotalTime + (10 - countdown));
+      setCountdown(10);
+
       if (i < 10) {
         iterate(i + 1);
-        setCountdown(10);
       } else {
-        clearInterval(timer);
         calculateFinalStats();
       }
-    }
+    },
+    [i, countdown, setPlayerStats, calculateFinalStats]
+  );
 
-    return () => clearInterval(timer);
-  }, [countdown, i, setPlayerStats]);
+  const handleTimeOut = useCallback(() => {
+    handleNextQuestion(false);
+  }, [handleNextQuestion]);
+
+  useEffect(() => {
+    if (countdown === 0) {
+      handleTimeOut();
+    }
+  }, [countdown, handleTimeOut]);
 
   useEffect(() => {
     console.log("Player Stats updated:", playerStats);
   }, [playerStats]);
 
-  const iterateQuestion = (isCorrect: boolean) => {
-    setPlayerStats((prevStats) => ({
-      ...prevStats,
-      wrongAnswers: isCorrect
-        ? prevStats.wrongAnswers
-        : prevStats.wrongAnswers + 1,
-    }));
-    if (i < 10) {
-      iterate(i + 1);
-      setCountdown(10);
-    } else {
-      calculateFinalStats();
-    }
-  };
-
-  const calculateFinalStats = async () => {
-    const averageTime = totalTime / 10;
-    const finalStats = {
-      ...playerStats,
-      totalTime: `${totalTime} seconds`,
-      timePerQuestion: `${averageTime.toFixed(2)} seconds`,
-    };
-
-    setPlayerStats(finalStats);
-
-    try {
-      await postPlayerStats(finalStats);
-      console.log("Player stats posted successfully");
-    } catch (error) {
-      console.error("Failed to post player stats:", error.message);
-    }
-
-    navigate("/score");
-  };
-
   return (
     <div className="question__container">
-      <h1>Question</h1>
+      <h1>Question {i}</h1>
+      <CircularTimer key={i} duration={10} onComplete={handleTimeOut} />
       <p>{triviaQuestions[i].question}</p>
       {Object.values(triviaQuestions[i].potentialAnswers).map(
         (answer, index) => (
-          <button key={index} onClick={() => iterateQuestion(answer.correct)}>
+          <button
+            key={index}
+            onClick={() => handleNextQuestion(answer.correct)}
+          >
             {answer.text}
           </button>
         )
       )}
       <div>
         <p>Wrong Answers: {playerStats.wrongAnswers}</p>
-        <p>Time Remaining: {countdown} seconds</p>
       </div>
     </div>
   );
