@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { triviaQuestions } from "../LookUpTables/TriviaQuestionLUT";
 import { usePlayerStats } from "../Context/usePlayerStats";
 import { useNavigate } from "react-router-dom";
+import { postPlayerStats } from "../Services/Stats_Service";
 
 const Question = () => {
   const [i, iterate] = useState(1);
@@ -46,19 +47,29 @@ const Question = () => {
     }));
     if (i < 10) {
       iterate(i + 1);
-      setCountdown(10); // Reset the countdown for the next question
+      setCountdown(10);
     } else {
       calculateFinalStats();
     }
   };
 
-  const calculateFinalStats = () => {
+  const calculateFinalStats = async () => {
     const averageTime = totalTime / 10;
-    setPlayerStats((prevStats) => ({
-      ...prevStats,
+    const finalStats = {
+      ...playerStats,
       totalTime: `${totalTime} seconds`,
       timePerQuestion: `${averageTime.toFixed(2)} seconds`,
-    }));
+    };
+
+    setPlayerStats(finalStats);
+
+    try {
+      await postPlayerStats(finalStats);
+      console.log("Player stats posted successfully");
+    } catch (error) {
+      console.error("Failed to post player stats:", error.message);
+    }
+
     navigate("/score");
   };
 

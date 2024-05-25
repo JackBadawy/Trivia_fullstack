@@ -52,7 +52,6 @@ public class PlayerDataController {
         }
 	}
 	
-	//might add update
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<PlayerData> deletePostById(@PathVariable Long id) {
