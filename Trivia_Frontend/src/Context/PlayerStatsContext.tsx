@@ -38,13 +38,3 @@ export const PlayerStatsProvider: React.FC<PlayerStatsProviderProps> = ({
     </PlayerStatsContext.Provider>
   );
 };
-
-export const usePlayerStatsContext = (): PlayerStatsContextType => {
-  const context = useContext(PlayerStatsContext);
-  if (!context) {
-    throw new Error(
-      "usePlayerStatsContext must be used within a PlayerStatsProvider"
-    );
-  }
-  return context;
-};

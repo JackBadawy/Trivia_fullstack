@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { PlayerStatsContextType } from "./playerStatsContext";
-import { PlayerStatsContext } from "./playerStatsContext";
+import { PlayerStatsContextType } from "./PlayerStatsContext";
+import { PlayerStatsContext } from "./PlayerStatsContext";
 
 export const usePlayerStats = (): PlayerStatsContextType => {
   const context = useContext(PlayerStatsContext);
